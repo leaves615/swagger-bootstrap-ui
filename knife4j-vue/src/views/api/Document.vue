@@ -413,7 +413,7 @@ export default {
             //  过滤掉忽略参数
             .filter(
               ({ name }) =>
-                !ignoreParameterAllKeys.includes(name) 
+                !ignoreParameterAllKeys.includes(name)
             )
         ); */
         // console.log(data);
@@ -699,7 +699,7 @@ export default {
       if (rcodes != null && rcodes != undefined) {
         for(let i=0;i<rcodes.length;i++){
           let rc=rcodes[i];
-          
+
           // 遍历
           if (rc.schema != undefined && rc.schema != null) {
             var respdata = [];
@@ -781,9 +781,10 @@ export default {
             // https://gitee.com/xiaoym/knife4j/issues/I5W145
             if(i==0){
               //不存在schema，直接赋值
-              that.multipData=rc;
+              var nresobj = { ...rc, data: rc.responseParameters };
+              that.multipData=nresobj;
             }
-            
+
           }
         }
         var multipKeys = Object.keys(that.multipData);

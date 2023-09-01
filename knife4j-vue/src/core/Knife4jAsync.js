@@ -3128,7 +3128,7 @@ SwaggerBootstrapUi.prototype.processModels = function () {
  * @param {*} rootParam
  */
 function deepTreeTableSchemaModel(model, treeTableModel, param, rootParam) {
-  // //console(model.name)
+  // console(model.name)
   if (KUtils.checkUndefined(param.schemaValue)) {
     var schema = treeTableModel[param.schemaValue];
     if (KUtils.checkUndefined(schema)) {
@@ -4568,6 +4568,129 @@ SwaggerBootstrapUi.prototype.initApiInfoAsyncOAS3 = function (swpinfo) {
                     }
                   }
                 }
+              } else {
+                // 判断是否存在properties属性
+                if (schema.hasOwnProperty('properties')) {
+                  swaggerResp.schema = t;
+                  // 自定义类型、放入difarrs对象中
+                  var swud = new SwaggerBootstrapUiDefinition();
+                  swud.name = swpinfo.id;
+                  swud.description = '自定义Schema';
+                  definitionType = swud.name;
+                  rptype = swud.name;
+                  swaggerResp.responseParameterRefName = swud.name;
+
+                  var properties = schema['properties'];
+                  var defiTypeValue = {};
+                  var handleProperty = function (property,properties,_swpinfo) {
+                    var spropObj = new SwaggerBootstrapUiProperty();
+                    spropObj.name = property;
+                    var propobj = properties[property];
+                    spropObj.originProperty = propobj;
+                    spropObj.type = KUtils.propValue('type', propobj, 'string');
+                    spropObj.description = KUtils.propValue('description', propobj, '');
+                    // spropObj.example = KUtils.propValue('example', propobj, '');
+                    spropObj.example = KUtils.getExample('example', propobj, '');
+                    spropObj.format = KUtils.propValue('format', propobj, '');
+                    spropObj.required = KUtils.propValue('required', propobj, false);
+                    // 默认string类型
+                    var propValue = '';
+                    // 判断是否有类型
+                    if (propobj.hasOwnProperty('type')) {
+                      var type = propobj['type'];
+                      // 判断是否有example
+                      if (propobj.hasOwnProperty('example')) {
+                        if (type == 'string') {
+                          // propValue = String(KUtils.propValue('example', propobj, ''));
+                          propValue = KUtils.getExample('example', propobj, '');
+                        } else {
+                          propValue = propobj['example'];
+                        }
+                      } else if (KUtils.checkIsBasicType(type)) {
+                        propValue = KUtils.getBasicTypeValue(type);
+                      }
+
+                    }
+                    spropObj.value = propValue;
+
+                    //判断是否有类型type
+                    if (propobj.hasOwnProperty('type')) {
+                      var t = propobj['type'];
+                      if (t === 'array') {
+                        if (propobj.hasOwnProperty('items')) {
+                          var items = propobj['items'];
+                          var itref = items['$ref'];
+                          // 此处需判断items是否数组
+                          if (items.hasOwnProperty('type')) {
+                            if (items['type'] === 'array') {
+                              itref = items['items']['$ref'];
+                            }
+                          }
+                          if (regex.test(itref)) {
+                            var ptype = RegExp.$1;
+                            var _schema = _swpinfo.openApiRaw.components[ptype];
+                            if(_schema.hasOwnProperty('properties')) {
+                              var __properties = _schema['properties'];
+                              var _defiTypeValue = {};
+                              for (var __property in __properties) {
+                                const rtn = handleProperty(__property,__properties)
+                                spropObj.properties.push(rtn.spropObj)
+                                _defiTypeValue[__property] = rtn.propValue;
+                              }
+                              propValue = _defiTypeValue
+                            }
+                          }
+                        }
+                      }
+                    }
+                    else if(propobj.hasOwnProperty('properties')){ //判断是否存在properties属性
+                      var _properties = propobj['properties'];
+                      var _defiTypeValue = {};
+                      for (var _property in _properties) {
+                        const rtn = handleProperty(_property,_properties)
+                        spropObj.properties.push(rtn.spropObj)
+                        defiTypeValue[property] = rtn.propValue;
+                        _defiTypeValue[__property] = rtn.propValue;
+                      }
+                      propValue = _defiTypeValue
+                    }
+                    if (swud.required.length > 0) {
+                      // 有required属性,需要再判断一次
+                      // if ($.inArray(spropObj.name, swud.required) > -1) {
+                      if (swud.required.includes(spropObj.name)) {
+                        // 存在
+                        spropObj.required = true;
+                      }
+                    }
+                    // 判断是否有format,如果是integer,判断是64位还是32位
+                    if (spropObj.format != null && spropObj.format != undefined && spropObj.format != '') {
+                      // spropObj.type=spropObj.format;
+                      spropObj.type += '(' + spropObj.format + ')';
+                    }
+                    return {spropObj, propValue}
+                  }
+
+
+                  for (var property in properties) {
+                    const {spropObj, propValue} = handleProperty(property,properties, swpinfo)
+                    swud.properties.push(spropObj);
+                    defiTypeValue[property] = propValue;
+                  }
+                  swud.value = defiTypeValue;
+                  swud.init = true;
+                  that.currentInstance.difArrs.push(swud);
+                } else {
+                  // 判断是否是基础类型
+                  if (KUtils.checkIsBasicType(t)) {
+                    // 基础类型
+                    swpinfo.responseText = t;
+                    swpinfo.responseBasicType = true;
+
+                    // 响应状态码的响应内容
+                    swaggerResp.responseText = t;
+                    swaggerResp.responseBasicType = true;
+                  }
+                }
               }
 
             } else {
@@ -4643,15 +4766,47 @@ SwaggerBootstrapUi.prototype.initApiInfoAsyncOAS3 = function (swpinfo) {
                           deepTreeTableResponseRefParameter(swaggerResp, that, _tmpSchemaValue, resParam);
                         }
                       } else {
-                        resParam.schemaValue = p.type;
-                        resParam.schema = true;
-                        // 存在引用类型,修改默认type
-                        resParam.type = p.type;
-                        var deepDef = that.getDefinitionByName(p.type, swpinfo.oas2);
-                        let _tmpSchemaValue = deepDef != null ? deepDef : p;
-                        deepResponseRefParameter(swaggerResp, that, _tmpSchemaValue, resParam);
-                        resParam.parentTypes.push(p.type);
-                        deepTreeTableResponseRefParameter(swaggerResp, that, _tmpSchemaValue, resParam);
+                        if(p.refType == null){
+                          // 常规参数
+                          resParam.schema=false
+                          resParam.schema = false;
+                          resParam.type = p.type;
+                          resParam.require = p.required
+                          resParam.description = p.description
+                          resParam.example = p.example
+                          resParam.value = p.value
+                          if (p.hasOwnProperty('properties')) {
+                            let handleProperties = function (properties) {
+                              var arr = []
+                              properties.forEach(function (p) {
+                                var _resParam = new SwaggerBootstrapUiParameter();
+                                _resParam.name = p.name;
+                                _resParam.schema = false;
+                                _resParam.type = p.type;
+                                _resParam.require = p.required
+                                _resParam.description = p.description
+                                _resParam.example = p.example
+                                _resParam.value = p.value
+                                if (p.hasOwnProperty('properites')) {
+                                  _resParam.children = handleProperties(p['properties'])
+                                }
+                                arr.push(_resParam);
+                              })
+                              return arr;
+                            }
+                            resParam.children = handleProperties(p['properties'])
+                          }
+                        } else {
+                          resParam.schemaValue = p.type;
+                          resParam.schema = true;
+                          // 存在引用类型,修改默认type
+                          resParam.type = p.type;
+                          var deepDef = that.getDefinitionByName(p.type, swpinfo.oas2);
+                          let _tmpSchemaValue = deepDef != null ? deepDef : p;
+                          deepResponseRefParameter(swaggerResp, that, _tmpSchemaValue, resParam);
+                          resParam.parentTypes.push(p.type);
+                          deepTreeTableResponseRefParameter(swaggerResp, that, _tmpSchemaValue, resParam);
+                        }
                       }
                     } else {
                       if (p.refType != null) {

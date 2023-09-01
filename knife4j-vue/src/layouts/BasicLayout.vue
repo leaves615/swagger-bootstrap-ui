@@ -433,7 +433,6 @@ export default {
             let _winLocation = window.location;
             window.console.log(_winLocation)
             let _demoCode = KUtils.getLocationParams('code');
-            debugger
             window.console.log("project-demo-code:" + _demoCode);
             let _url = "/demo/data/" + _demoCode + ".json";
             window.console.log("url:" + _url);
@@ -468,7 +467,6 @@ export default {
               let _winLocation = window.location;
               window.console.log(_winLocation)
               let _demoCode = KUtils.getLocationParams('code');
-              debugger
               window.console.log("project-demo-code:" + _demoCode);
               let _url = "/demo/data/" + _demoCode + ".json";
               window.console.log("url:" + _url);
