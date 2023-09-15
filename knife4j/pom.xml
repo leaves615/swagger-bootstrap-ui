@@ -77,14 +77,17 @@
         <url>git@gitee.com:xiaoym/knife4j.git</url>
     </scm>
     <distributionManagement>
-        <snapshotRepository>
-            <id>oss</id>
-            <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
-        </snapshotRepository>
         <repository>
-            <id>oss</id>
-            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+            <id>central</id>
+            <name>devServer-releases</name>
+            <!--            <url>http://repo.ngrok.51meets.com/artifactory/libs-release-local</url>-->
+            <url>http://192.168.3.174:8081/artifactory/commons</url>
         </repository>
+        <snapshotRepository>
+            <id>snapshots</id>
+            <name>devServer-snapshots</name>
+            <url>http://192.168.3.174:8081/artifactory/commons</url>
+        </snapshotRepository>
     </distributionManagement>
 
     <dependencies>
