@@ -4460,10 +4460,11 @@ SwaggerBootstrapUi.prototype.initApiInfoAsyncOAS3 = function (swpinfo) {
               // 单引用类型
               // 判断是否是数组类型
               // var regex = new RegExp('#/definitions/(.*)$', 'ig');
-              var regex = new RegExp(KUtils.oasmodel(swpinfo.oas2), 'ig');
+              var regex = new RegExp(KUtils.oasmodel(swpinfo.oas2));
               if (schema.hasOwnProperty('$ref')) {
-                if (regex.test(schema['$ref'])) {
-                  var ptype = RegExp.$1;
+                var matches = schema['$ref'].match(regex);
+                if (matches) {
+                  var ptype = matches[1];
                   swpinfo.responseParameterRefName = ptype;
                   swaggerResp.responseParameterRefName = ptype;
                   definitionType = ptype;
@@ -4483,8 +4484,9 @@ SwaggerBootstrapUi.prototype.initApiInfoAsyncOAS3 = function (swpinfo) {
                         itref = items['items']['$ref'];
                       }
                     }
-                    if (regex.test(itref)) {
-                      var ptype = RegExp.$1;
+                    var _matches = itref.match(regex)
+                    if (_matches) {
+                      var ptype = _matches[1];
                       swpinfo.responseParameterRefName = ptype;
                       swaggerResp.responseParameterRefName = ptype;
                       definitionType = ptype;
@@ -4587,7 +4589,7 @@ SwaggerBootstrapUi.prototype.initApiInfoAsyncOAS3 = function (swpinfo) {
                     spropObj.name = property;
                     var propobj = properties[property];
                     spropObj.originProperty = propobj;
-                    spropObj.type = KUtils.propValue('type', propobj, 'string');
+                    spropObj.type = KUtils.propValue('type', propobj, 'ref');
                     spropObj.description = KUtils.propValue('description', propobj, '');
                     // spropObj.example = KUtils.propValue('example', propobj, '');
                     spropObj.example = KUtils.getExample('example', propobj, '');
@@ -4619,21 +4621,22 @@ SwaggerBootstrapUi.prototype.initApiInfoAsyncOAS3 = function (swpinfo) {
                       if (t === 'array') {
                         if (propobj.hasOwnProperty('items')) {
                           var items = propobj['items'];
-                          var itref = items['$ref'];
+                          var itarrref = items['$ref'];
                           // 此处需判断items是否数组
                           if (items.hasOwnProperty('type')) {
                             if (items['type'] === 'array') {
-                              itref = items['items']['$ref'];
+                              itarrref = items['items']['$ref'];
                             }
                           }
-                          if (regex.test(itref)) {
-                            var ptype = RegExp.$1;
+                          var _matches = itarrref.match(regex)
+                          if (_matches) {
+                            var ptype = _matches[1];
                             var _schema = _swpinfo.openApiRaw.components[ptype];
                             if(_schema.hasOwnProperty('properties')) {
                               var __properties = _schema['properties'];
                               var _defiTypeValue = {};
                               for (var __property in __properties) {
-                                const rtn = handleProperty(__property,__properties)
+                                const rtn = handleProperty(__property,__properties,_swpinfo)
                                 spropObj.properties.push(rtn.spropObj)
                                 _defiTypeValue[__property] = rtn.propValue;
                               }
@@ -4653,6 +4656,22 @@ SwaggerBootstrapUi.prototype.initApiInfoAsyncOAS3 = function (swpinfo) {
                         _defiTypeValue[__property] = rtn.propValue;
                       }
                       propValue = _defiTypeValue
+                    } else if (propobj.hasOwnProperty('$ref')) {
+                      var _matches = propobj['$ref'].match(regex)
+                      if (_matches) {
+                        var ptype = _matches[1];
+                        var _schema = _swpinfo.openApiRaw.components[ptype];
+                        if(_schema.hasOwnProperty('properties')) {
+                          var __properties = _schema['properties'];
+                          var _defiTypeValue = {};
+                          for (var __property in __properties) {
+                            const _rtn = handleProperty(__property,__properties,_swpinfo)
+                            spropObj.properties.push(_rtn.spropObj)
+                            _defiTypeValue[__property] = _rtn.propValue;
+                          }
+                          propValue = _defiTypeValue
+                        }
+                      }
                     }
                     if (swud.required.length > 0) {
                       // 有required属性,需要再判断一次
@@ -4787,7 +4806,7 @@ SwaggerBootstrapUi.prototype.initApiInfoAsyncOAS3 = function (swpinfo) {
                                 _resParam.description = p.description
                                 _resParam.example = p.example
                                 _resParam.value = p.value
-                                if (p.hasOwnProperty('properites')) {
+                                if (p.hasOwnProperty('properties')) {
                                   _resParam.children = handleProperties(p['properties'])
                                 }
                                 arr.push(_resParam);

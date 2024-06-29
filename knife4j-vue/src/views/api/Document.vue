@@ -217,7 +217,7 @@ export default {
   },
   created() {
     var that = this;
-    // console.log("Document")
+    console.log("Document")
     // console.log(this.api);
     var key = Constants.globalTreeTableModelParams + this.swaggerInstance.id;
     var treeTableModel = this.swaggerInstance.swaggerTreeTableModels;
