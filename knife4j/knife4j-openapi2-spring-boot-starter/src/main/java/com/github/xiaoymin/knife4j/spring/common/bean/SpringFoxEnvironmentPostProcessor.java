@@ -23,6 +23,9 @@ import org.springframework.boot.DefaultPropertiesPropertySource;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.env.EnvironmentPostProcessor;
 import org.springframework.core.env.ConfigurableEnvironment;
+import org.springframework.core.env.MapPropertySource;
+import org.springframework.core.env.MutablePropertySources;
+import org.springframework.core.env.PropertySource;
 import org.springframework.util.ClassUtils;
 
 import java.util.HashMap;
@@ -66,9 +69,16 @@ public class SpringFoxEnvironmentPostProcessor implements EnvironmentPostProcess
                 Map<String, Object> sources = new HashMap<>();
                 // springfox使用的策略是AntPathMatcher
                 sources.put(SPRING_MVC_MATCHING_STRATEGY, "ant_path_matcher");
-                DefaultPropertiesPropertySource defaultPropertiesPropertySource = new DefaultPropertiesPropertySource(sources);
-                // 更新，添加一个默认值
-                environment.getPropertySources().addLast(defaultPropertiesPropertySource);
+                // 添加
+                // fixed https://github.com/xiaoymin/knife4j/issues/686
+                // 如果environment中存在defaultProperties则直接将配置加入到该PropertySource中，不存在则创建新的defaultProperties加入到environment中
+                MutablePropertySources propertySources = environment.getPropertySources();
+                PropertySource<?> defaultProperties = propertySources.remove(DefaultPropertiesPropertySource.NAME);
+                if (defaultProperties == null) {
+                    defaultProperties = new MapPropertySource(DefaultPropertiesPropertySource.NAME, new HashMap<>());
+                }
+                ((MapPropertySource) defaultProperties).getSource().putAll(sources);
+                propertySources.addLast(defaultProperties);
             }
         }
     }

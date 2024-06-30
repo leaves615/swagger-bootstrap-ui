@@ -124,9 +124,8 @@
             响应示例
           </div>
           <a-row :id="'knife4jDocumentShowEditor' + api.id + resp.code">
-            <editor-show @showDescription="showResponseEditFieldDescription" :value="
-              resp.responseBasicType ? resp.responseText : resp.responseValue
-            "></editor-show>
+            <editor-show @showDescription="showResponseEditFieldDescription" :value="resp.responseBasicType ? resp.responseText : resp.responseValue
+              "></editor-show>
           </a-row>
 
           <!-- <editor :value="resp.responseBasicType ? resp.responseText : resp.responseValue" @init="multiResponseSampleEditorInit" lang="json" theme="eclipse" width="100%" :height="editorMultiHeight"></editor> -->
@@ -157,11 +156,10 @@
         响应示例
       </div>
       <a-row :id="'knife4jDocumentShowEditor' + api.id">
-        <editor-show @showDescription="showResponseEditFieldDescription" :value="
-  multipData.responseBasicType
-    ? multipData.responseText
-    : multipData.responseValue
-        "></editor-show>
+        <editor-show @showDescription="showResponseEditFieldDescription" :value="multipData.responseBasicType
+          ? multipData.responseText
+          : multipData.responseValue
+          "></editor-show>
 
       </a-row>
     </div>
@@ -554,7 +552,7 @@ export default {
         that.reqParameters = reqParameters;
       }
       // console.log("document")
-      // console.log(reqParameters);
+      //console.log(reqParameters);
     },
     deepRootKeys(tmpIncludeKeys, rootKeys) {
       var tmpRooks = [];
@@ -697,8 +695,8 @@ export default {
       //console.log("rcodes")
       //console.log(rcodes)
       if (rcodes != null && rcodes != undefined) {
-        for(let i=0;i<rcodes.length;i++){
-          let rc=rcodes[i];
+        for (let i = 0; i < rcodes.length; i++) {
+          let rc = rcodes[i];
 
           // 遍历
           if (rc.schema != undefined && rc.schema != null) {
@@ -738,6 +736,14 @@ export default {
                           schemaName
                         );
                         model = that.swagger.analysisDefinitionRefTableModel(that.swaggerInstance.id, model);
+                        if (!KUtils.checkUndefined(param.description)) {
+                          //如果参数已经有description，那么就不赋值，否则，取model的description
+                          if (KUtils.checkUndefined(model.description)) {
+                            param.description = model.description;
+                          }
+                        }
+
+                        //console.log('params-model', model)
                         if (model && model.params) {
                           param.children = model.params.map(child => {
                             const newObj = that.copyNewParameter(child);
@@ -748,10 +754,10 @@ export default {
                       } else {
                         //console.log("schemavalue--Not Existis,",schemaName)
                         //非ref类型，在当前自己的params在过滤一边
-                        let childrenParamArray=respdata.filter(childrenParam=>childrenParam.pid==param.id);
+                        let childrenParamArray = respdata.filter(childrenParam => childrenParam.pid == param.id);
                         //console.log(childrenParamArray)
-                        if(KUtils.checkUndefined(childrenParamArray)){
-                          param.children=childrenParamArray.map(cd=>{
+                        if (KUtils.checkUndefined(childrenParamArray)) {
+                          param.children = childrenParamArray.map(cd => {
                             const newObj = that.copyNewParameter(cd);
                             newObj.pid = param.id;
                             return newObj;
@@ -776,13 +782,12 @@ export default {
               that.multipData = nresobj;
             }
             that.multipCodeDatas.push(nresobj);
-          }else{
+          } else {
             // 只获取第一个
             // https://gitee.com/xiaoym/knife4j/issues/I5W145
-            if(i==0){
+            if (i == 0) {
               //不存在schema，直接赋值
-              var nresobj = { ...rc, data: rc.responseParameters };
-              that.multipData=nresobj;
+              that.multipData = rc;
             }
 
           }

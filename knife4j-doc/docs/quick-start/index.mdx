@@ -19,6 +19,12 @@ import OpenAPI3 from '!!raw-loader!./codeSamples/OpenAPI3.java';
 import IndexController2 from '!!raw-loader!./codeSamples/IndexController2.java';
 import IndexController3 from '!!raw-loader!./codeSamples/IndexController3.java';
 
+:::tip 温馨提醒
+
+**Knife4jInsight(简单、方便的OpenAPI接口文档私有化聚合平台),地址：[http://knife4j.net](http://knife4j.net)**
+
+:::
+
 如果你对选择Knife4j的版本存在疑惑，可以参考文档[Knife4j版本参考](quick-start/start-knife4j-version) 
 
 
@@ -40,11 +46,16 @@ import IndexController3 from '!!raw-loader!./codeSamples/IndexController3.java';
 <dependency>
     <groupId>com.github.xiaoymin</groupId>
     <artifactId>knife4j-openapi3-jakarta-spring-boot-starter</artifactId>
-    <version>4.3.0</version>
+    <version>4.4.0</version>
 </dependency>
 
 ```
+Gradle坐标如下：
 
+```xml
+implementation("com.github.xiaoymin:knife4j-openapi3-jakarta-spring-boot-starter:4.4.0")
+
+```
 引入之后，其余的配置，开发者即可完全参考[springdoc-openapi](https://springdoc.org/)的项目说明，Knife4j只提供了增强部分，如果要启用Knife4j的增强功能，可以在配置文件中进行开启
 
 部分配置如下:
@@ -128,7 +139,7 @@ Knife4j有了新的变化，主要有以下几点：
 <dependency>
     <groupId>com.github.xiaoymin</groupId>
     <artifactId>knife4j-openapi2-spring-boot-starter</artifactId>
-    <version>4.3.0</version>
+    <version>4.4.0</version>
 </dependency>
 ```
 
@@ -175,7 +186,7 @@ Knife4j在只有的OpenAPI3规范中，底层基础框架选择springdoc-openapi
 <dependency>
     <groupId>com.github.xiaoymin</groupId>
     <artifactId>knife4j-openapi3-spring-boot-starter</artifactId>
-    <version>4.3.0</version>
+    <version>4.4.0</version>
 </dependency>
 
 ``` 

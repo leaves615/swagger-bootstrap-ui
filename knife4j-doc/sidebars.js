@@ -1,7 +1,15 @@
 const donateHtml = `
 <div class="sidebar_donate">
     <div class="sidebar_sponsor"> 
-        <a target="_blank" href="https://tiaocanshu.com?utm_source=knife4j"><img src="/images/sponsor/tiaocanshu/logo.png"/>
+        <a target="_blank" href="https://www.orangeforms.com?utm_source=knife4j"><img src="/images/sponsor/orangeforms/logo.jpg"/>
+        </a>
+    </div>
+    <div class="sidebar_sponsor" style="margin-top:10px"> 
+        <a target="_blank" href="https://www.luxiangdong.com/2024/01/25/lanuch-1/?utm_source=knife4j"><img src="/images/sponsor/torchv/logo3.png"/>
+        </a>
+    </div>
+    <div class="sidebar_sponsor" style="margin-top:10px"> 
+        <a target="_blank" href="http://knife4j.net?utm_source=knife4j"><img src="/images/sponsor/knife4j/logo2.png"/>
         </a>
     </div>
     
