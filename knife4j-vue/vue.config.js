@@ -27,7 +27,8 @@ module.exports = {
     },
     proxy: {
       "/": {
-        target: 'http://localhost:8080/',
+        // target: 'http://localhost:8080/',
+        target: 'https://guansaiduo-api.t.51meets.com',
         //target: 'http://localhost:17813',
         /* target: 'http://knife4j.xiaominfo.com/', */
         ws: true,
